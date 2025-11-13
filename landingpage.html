@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Rush UE Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'Ariel', 'sans-serif'],
+                    },
+                    colors: {
+                        'ue-red': '#a00000',
+                        'ue-dark': '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    
+    <style>
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            pointer-events: none;
+        }
+
+        .message-box.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-4">
+    
+    <div class="w-full max-w-sm bg-white rounded-xl shadow-lg p-6">
+
+        <header class="flex items-center justify-between border-b pb-4 mb-6">
+            <div class="flex items-center gap-2">
+                <div id="logo-container" class="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-ue-red">
+                    <img 
+                        id="university-logo"
+                        src="images/rushuelogo.jpg" 
+                        alt="Rush UE Logo"
+                        class="h-full w-full object-cover"
+                        onerror="this.style.display='none'; document.getElementById('logo-icon-fallback').style.display='block';"
+                    >
+                    <i id="logo-icon-fallback" class="fas fa-university text-white text-lg hidden" style="display:none;"></i>
+                </div>
+                <h1 class="text-xl font-bold text-ue-dark">Rush <span class="text-ue-red">UE</span></h1>
+            </div>
+            <a href="login.html" class="text-slate-600 hover:text-ue-red" aria-label="Administrative Login">
+                <i class="fas fa-shield-alt text-lg"></i>
+            </a>
+        </header>
+
+        <main class="text-center">
+            <h2 class="text-2xl font-bold text-ue-dark mb-4">Welcome to Rush UE</h2>
+            <p class="text-slate-500 mb-8">
+                Please select your role to proceed.
+            </p>
+
+            <div class="space-y-4">
+                
+                <a href="visitor.html" class="block">
+                    <button class="w-full flex items-center p-4 bg-white border border-slate-300 rounded-lg shadow-md hover:bg-slate-50 transition-colors">
+                        <div class="p-2 bg-blue-100 rounded-full text-blue-600 mr-4">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <span class="text-lg font-medium text-ue-dark">Visitors</span>
+                        <i class="fas fa-chevron-right ml-auto text-slate-400"></i>
+                    </button>
+                </a>
+                
+                <a href="login.html" class="block">
+                    <button class="w-full flex items-center p-4 bg-white border border-slate-300 rounded-lg shadow-md hover:bg-slate-50 transition-colors">
+                        <div class="p-2 bg-red-100 rounded-full text-ue-red mr-4">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <span class="text-lg font-medium text-ue-dark">Students</span>
+                        <i class="fas fa-chevron-right ml-auto text-slate-400"></i>
+                    </button>
+                </a>
+            </div>
+        </main>
+        
+        <footer class="mt-8 pt-4 border-t text-center text-xs text-slate-400">
+            &copy; 2025 Rush UE
+        </footer>
+    </div>
+
+    <div id="customMessageBox" class="message-box p-4 bg-ue-red text-white rounded-lg shadow-xl max-w-xs text-sm">
+        <p id="messageText"></p>
+        <button onclick="hideCustomMessage()" class="mt-2 text-xs font-semibold underline hover:text-slate-200">
+            Dismiss
+        </button>
+    </div>
+
+    <script>
+        function showCustomMessage(message) {
+            const box = document.getElementById('customMessageBox');
+            const text = document.getElementById('messageText');
+            
+            text.textContent = message;
+            box.classList.add('show');
+
+            setTimeout(hideCustomMessage, 3000);
+        }
+
+        function hideCustomMessage() {
+            document.getElementById('customMessageBox').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

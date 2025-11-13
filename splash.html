@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UE Navigational App - Loading</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #000; 
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+
+    .logo img {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      object-fit: cover;
+      animation: float 1.8s ease-in-out infinite alternate;
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.3);
+    }
+
+    @keyframes float {
+      from { transform: translateY(0px); }
+      to { transform: translateY(-15px); }
+    }
+
+
+    .progress-container {
+      width: 220px;
+      height: 6px;
+      background-color: #222;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 30px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #da2929, #ff0000);
+      animation: loadBar 2.8s ease-in-out forwards;
+    }
+
+    @keyframes loadBar {
+      100% { width: 100%; }
+    }
+
+
+    .loading-text {
+      color: #fff;
+      margin-top: 25px;
+      letter-spacing: 3px;
+      font-size: 1rem;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0.5; }
+    }
+
+
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      color: #777;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 600px) {
+      .logo img { width: 120px; height: 120px; }
+      .progress-container { width: 160px; }
+      .loading-text { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+
+  <div class="logo">
+    <img src="images/rushuelogo.jpg" alt="App Logo" />
+  </div>
+
+
+  <div class="progress-container">
+    <div class="progress-bar"></div>
+  </div>
+
+
+  <div class="loading-text">INITIALIZING...</div>
+
+
+  <div class="footer">University of the East • Navigational App</div>
+
+  <script>
+    window.onload = function() {
+      if (!sessionStorage.getItem('splashShown')) {
+        setTimeout(function() {
+          window.location.href = 'landingpage.html';
+          sessionStorage.setItem('splashShown', 'true');
+        }, 3000);
+      } else {
+        window.location.href = 'landingpage.html';
+      }
+    };
+  </script>
+
+</body>
+</html>

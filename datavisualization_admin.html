@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Rush UE | Data Visualization</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+  <style>
+    :root {
+      --ue-red: #dc3545;
+      --muted: #6b7280;
+      --white: #fff;
+      --light-bg: #fbd1dc;
+      --card-bg: #fff;
+      --blue: #007bff;
+      --purple: #6f42c1;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to bottom, var(--light-bg), var(--white));
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background: var(--white);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    .navbar-brand img {
+      width: 80px;
+      height: auto;
+      border-radius: 50%;
+    }
+
+    .navbar-text-center {
+      flex: 1;
+      text-align: center;
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: #000;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .card {
+      border-radius: 14px;
+      background: var(--card-bg);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+    }
+
+    canvas {
+      max-height: 260px;
+      width: 100%;
+    }
+
+    .dashboard-container {
+      flex: 1;
+      padding-top: 24px;
+      z-index: 1;
+      position: relative;
+    }
+
+    .quick-range .btn {
+      font-weight: 600;
+      background-color: var(--blue);
+      color: #fff;
+      border-radius: 8px;
+      padding: 12px 20px;
+      margin: 5px 0;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+    }
+
+    .quick-range .btn:hover {
+      background-color: #0056b3;
+      transform: translateY(-3px);
+    }
+
+    .active-mode {
+      background: var(--ue-red) !important;
+      color: #fff !important;
+    }
+
+    footer {
+      background: var(--ue-red);
+      color: var(--white);
+      font-size: 0.9rem;
+      z-index: 2;
+      position: relative;
+      padding: 10px 0;
+    }
+
+    footer a {
+      color: var(--white);
+      text-decoration: underline;
+    }
+
+    .form-label {
+      font-weight: 500;
+    }
+
+    .form-select,
+    .form-control {
+      font-size: 1rem;
+      padding: 0.6rem;
+    }
+
+    .controls input[type="date"],
+    .controls select {
+      font-size: 1rem;
+      padding: 0.8rem;
+    }
+
+    .controls .quick-range .btn {
+      padding: 0.6rem 1rem;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    .table-sm th,
+    .table-sm td {
+      font-size: 1rem;
+      padding: 1rem;
+      text-align: left;
+    }
+
+    .table-sm th {
+      font-weight: 600;
+    }
+
+    .table-sm td {
+      vertical-align: middle;
+    }
+
+    .card.my-3 {
+      margin-top: 1.5rem;
+    }
+
+    #searchInputContainer {
+      display: none;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 0.5rem 1rem;
+      margin-top: 10px;
+    }
+
+    #searchInput:focus {
+      outline: none;
+      border: 2px solid var(--blue);
+    }
+
+    #btnRefresh,
+    #btnCSV {
+      background-color: var(--purple);
+      border-color: var(--purple);
+      color: #fff;
+      font-weight: 600;
+      padding: 0.6rem;
+      text-transform: uppercase;
+    }
+
+    #btnRefresh:hover,
+    #btnCSV:hover {
+      background-color: #5a3d92;
+      border-color: #5a3d92;
+      transform: translateY(-3px);
+    }
+
+    #modeLabel {
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 991px) {
+      .quick-range .btn {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+
+      .controls .btn-group {
+        flex-wrap: wrap;
+      }
+
+      .controls input[type="date"],
+      .controls select {
+        width: 100%;
+      }
+
+      .navbar-text-center {
+        font-size: 1.2rem;
+      }
+
+      .table-sm th,
+      .table-sm td {
+        font-size: 0.85rem;
+      }
+
+      .controls input[type="date"],
+      .controls select {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+    }
+
+    #topBody {
+      font-weight: 500;
+      font-size: 1rem;
+    }
+
+    #topTitle {
+      font-weight: 600;
+    }
+
+    #recentTitle {
+      font-weight: 600;
+    }
+
+    #recentHead {
+      font-weight: 600;
+      font-size: 1rem;
+      text-align: left;
+    }
+
+    #recentHead th {
+      padding: 1rem;
+    }
+
+    #countLabel {
+      font-weight: 600;
+    }
+
+    #searchInputContainer {
+      margin-top: 20px;
+    }
+
+    #searchInputContainer {
+      padding: 15px;
+      background-color: var(--light-bg);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    #searchInputContainer input {
+      font-size: 1.1rem;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      width: 100%;
+    }
+
+    #searchInputContainer input:focus {
+      outline: none;
+      border-color: var(--blue);
+    }
+  </style>
+
+  <style>
+    :root {
+      --bg-color: linear-gradient(to bottom, #fbd1dc, #fff);
+      --header-bg: rgba(255, 255, 255, 0.9);
+      --header-title-color: #dc3545;
+      --text-color: #333;
+      --card-bg: rgba(255, 255, 255, 0.6);
+      --card-hover-bg: linear-gradient(145deg, #ffe0e8, #fff);
+      --primary-red: #dc3545;
+      --footer-bg: #dc3545;
+      --news-bg: rgba(255, 255, 255, 0.6);
+      --news-border: #eee;
+      --page-bg: rgba(255, 255, 255, 0.85);
+      --page-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      --status-danger: #dc3545;
+      --status-primary: #0d6efd;
+      --status-success: #198754;
+      --status-secondary: #6c757d;
+    }
+
+    .dark-mode {
+      --bg-color: linear-gradient(to bottom, #1a0000, #3d0000);
+      --header-bg: rgba(50, 0, 0, 0.9);
+      --header-title-color: #ffdde1;
+      --text-color: #ffdde1;
+      --card-bg: rgba(70, 0, 0, 0.7);
+      --card-hover-bg: linear-gradient(145deg, #a00000, #600000);
+      --primary-red: #ff4d4d;
+      --footer-bg: #1a0000;
+      --news-bg: rgba(70, 0, 0, 0.7);
+      --news-border: #444;
+      --page-bg: rgba(50, 0, 0, 0.95);
+      --page-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+
+      --status-danger: #ff6b6b;
+      --status-primary: #74aeff;
+      --status-success: #6be3a9;
+      --status-secondary: #aaaaaa;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-color);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+      color: var(--text-color);
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    .page-content {
+      display: none;
+    }
+
+    .page-content.active {
+      display: block;
+    }
+
+    .animated-bg,
+    .animated-bg2 {
+      position: fixed;
+      z-index: 0;
+      border-radius: 50%;
+      opacity: 0.3;
+      filter: blur(80px);
+      transition: background 0.5s ease;
+    }
+
+    .animated-bg {
+      top: -100px;
+      left: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--primary-red), var(--card-bg));
+      animation: float 10s ease-in-out infinite;
+    }
+
+    .animated-bg2 {
+      bottom: -120px;
+      right: -120px;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, var(--primary-red), var(--card-bg));
+      animation: float2 12s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0) translateX(0);
+      }
+
+      50% {
+        transform: translateY(20px) translateX(10px);
+      }
+    }
+
+    @keyframes float2 {
+
+      0%,
+      100% {
+        transform: translateY(0) translateX(0);
+      }
+
+      50% {
+        transform: translateY(-15px) translateX(-20px);
+      }
+    }
+
+    .header-container {
+      background-color: var(--header-bg);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-title {
+      font-weight: 600;
+      font-size: 1.8rem;
+      color: var(--header-title-color);
+      margin-left: 15px;
+      transition: color 0.5s ease;
+    }
+
+    .header-container .logo-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+      border: 3px solid var(--primary-red);
+    }
+
+    .dashboard-container,
+    .page-container {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-card {
+      background: var(--page-bg);
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: var(--page-shadow);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      transition: all 0.5s ease;
+      color: var(--text-color);
+    }
+
+    .card-dashboard {
+      border: none;
+      border-radius: 16px;
+      text-align: center;
+      transition: all 0.3s ease;
+      padding: 30px 15px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+    }
+
+    .card-dashboard i {
+      font-size: 2.5rem;
+      color: var(--primary-red);
+      margin-bottom: 12px;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .card-dashboard:hover {
+      transform: translateY(-8px);
+      background: var(--card-hover-bg);
+      box-shadow: 0 12px 30px rgba(220, 53, 69, 0.25), 0 0 15px rgba(255, 255, 255, 0.3);
+      border: 1px solid var(--primary-red);
+    }
+
+    .card-dashboard:hover i {
+      transform: scale(1.2);
+      color: #ff6f61;
+    }
+
+    .card-dashboard h6 {
+      font-weight: 600;
+      margin: 0;
+      font-size: 1rem;
+      color: var(--text-color);
+      transition: color 0.5s ease;
+    }
+
+    .news-feed-card {
+      background: var(--news-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 6px 6px 15px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .news-item {
+      border-bottom: 1px solid var(--news-border);
+      padding: 10px 0;
+      color: var(--text-color);
+    }
+
+    .news-item:last-child {
+      border-bottom: none;
+    }
+
+    footer {
+      background-color: var(--footer-bg);
+      color: white;
+      font-size: 0.9rem;
+      z-index: 2;
+      transition: background-color 0.5s ease;
+    }
+
+    footer a {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    #greeting-text {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--text-color);
+      margin-bottom: 0;
+      transition: color 0.5s ease;
+    }
+
+    #theme-toggle {
+      color: var(--primary-red);
+      transition: color 0.3s ease;
+    }
+
+    .dark-mode #theme-toggle {
+      color: var(--header-title-color);
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--header-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-red);
+      border-radius: 4px;
+    }
+
+    .dark-mode #news-archive-page .list-group-item {
+      background-color: var(--card-bg) !important;
+    }
+
+    .dark-mode #news-archive-page .list-group-item .text-danger {
+      color: var(--status-danger) !important;
+    }
+
+    .dark-mode #news-archive-page .list-group-item .text-primary {
+      color: var(--status-primary) !important;
+    }
+
+    .dark-mode #news-archive-page .list-group-item .text-success {
+      color: var(--status-success) !important;
+    }
+
+    .dark-mode #news-archive-page .list-group-item .text-secondary {
+      color: var(--status-secondary) !important;
+    }
+
+    .dark-mode #news-archive-page .list-group-item .text-muted {
+      color: var(--status-secondary) !important;
+    }
+
+
+    .dark-mode #news-archive-page .list-group-item:nth-child(1) {
+      border-left-color: var(--status-danger) !important;
+    }
+
+    .dark-mode #news-archive-page .list-group-item:nth-child(2) {
+      border-left-color: var(--status-primary) !important;
+    }
+
+    .dark-mode #news-archive-page .list-group-item:nth-child(3) {
+      border-left-color: var(--status-success) !important;
+    }
+
+    .dark-mode #news-archive-page .list-group-item:nth-child(4) {
+      border-left-color: var(--status-secondary) !important;
+    }
+
+        .back-button {
+    background-color: white;
+    color: black;
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+    .poi {
+    background: #fff;
+    border: 1px solid #e3e3e3;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+</head>
+<body class="light-mode">
+  <div class="animated-bg"></div>
+  <div class="animated-bg2"></div>
+
+  <div class="header-container sticky-top">
+    <div class="container d-flex align-items-center justify-content-between p-3 p-md-4">
+      <div class="d-flex align-items-center cursor-pointer" onclick="showPage('dashboard')">
+        <div class="logo-icon d-flex justify-content-center align-items-center" style="background-color: white;">
+          <i class="fa-solid fa-graduation-cap text-danger" style="font-size: 2rem;"></i>
+        </div>
+        <h2 class="header-title">Data Analytics</h2>
+      </div>
+
+      <div class="d-flex align-items-center">
+        <h3 id="greeting-text" class="me-3 d-none d-sm-block">Hi, Warrior!</h3>
+
+        <button id="theme-toggle" class="btn btn-sm" onclick="toggleTheme()" aria-label="Toggle Theme">
+          <i id="sun-icon" class="fa-solid fa-sun fa-xl"></i>
+          <i id="moon-icon" class="fa-solid fa-moon fa-xl" style="display: none;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container dashboard-container">
+    <button class="back-button" onclick="window.location.href='admininside.html'">Back</button>
+    <br><br>
+    <div class="card mb-3">
+      <div class="card-body controls">
+        <div class="row g-3 align-items-end">
+          <div class="col-12 col-lg-2">
+            <label class="form-label">From</label>
+            <input type="date" id="fromDate" class="form-control"/>
+          </div>
+          <div class="col-12 col-lg-2">
+            <label class="form-label">To</label>
+            <input type="date" id="toDate" class="form-control"/>
+          </div>
+
+          <div class="col-12 col-lg-3">
+            <label class="form-label">Quick range</label>
+            <div class="btn-group w-100 quick-range" role="group">
+              <button class="btn btn-outline-secondary" data-range="7d">7D</button>
+              <button class="btn btn-outline-secondary" data-range="30d">30D</button>
+              <button class="btn btn-outline-secondary" data-range="ytd">YTD</button>
+              <button class="btn btn-outline-secondary" data-range="12m">12M</button>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-2">
+            <label class="form-label">Building</label>
+            <select id="buildingFilter" class="form-select">
+              <option value="">All</option>
+              <option value="EN">Engineering (EN)</option>
+              <option value="TYK">TYK</option>
+              <option value="LCT">LCT</option>
+              <option value="UEC_MAIN">UEC Main</option>
+            </select>
+          </div>
+
+          <div class="col-12 col-lg-3 d-flex gap-2">
+            <button id="btnMode" class="btn btn-outline-dark flex-fill" title="Switch dataset">
+              <i class="fa-solid fa-compress-arrows-alt me-1"></i>
+              <span id="modeLabel">Switch to Visitor Slips</span>
+            </button>
+
+            <button id="btnRefresh" class="btn btn-danger flex-fill">
+              <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+            <button id="btnCSV" class="btn btn-outline-secondary flex-fill">
+              <i class="fa-solid fa-file-csv"></i> Export CSV
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-2 small muted">
+          <code id="sourceClicks"></code>
+          <span class="mx-1"> </span>
+          <code id="sourceSlips"></code>
+          <span class="ms-2" id="rangeLabel"></span>
+          <span class="ms-2 badge bg-light text-dark" id="modeBadge">Showing: Click Events</span>
+        </div>
+      </div>
+    </div>
+
+    <h5 class="mb-2" id="sectionTitle">Click Events</h5>
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="mb-2" id="chart1Title">Clicks per day</h6>
+            <canvas id="chartDaily"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="card">
+          <div class="card-body">
+            <h6 class="mb-2" id="chart2Title">Clicks per building</h6>
+            <canvas id="chartBuilding"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card my-3">
+      <div class="card-body">
+        <h6 class="mb-2" id="topTitle">Most clicked targets per building</h6>
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead id="topHead">
+              <tr><th style="width:160px">Building</th><th>Top Targets</th></tr>
+            </thead>
+            <tbody id="topBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="searchInputContainer" class="card mb-3" style="display: none;">
+      <div class="card-body">
+        <h6 class="mb-2">Search Visitor Slip by Name</h6>
+        <input type="text" id="searchInput" class="form-control" placeholder="Enter visitor name to search" />
+      </div>
+    </div>
+
+    <div class="card my-3">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h6 class="mb-2" id="recentTitle">Recent events</h6>
+          <span class="small muted" id="countLabel"></span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead id="recentHead">
+              <tr><th>Date</th><th>Building</th><th>Room</th><th>Target</th></tr>
+            </thead>
+            <tbody id="sampleBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+<footer class="fixed-bottom py-2" style="background-color: var(--footer-bg); color: white; text-align: center;">
+    <div class="container">
+        <p class="mb-0 text-sm">
+        <span id="yy"></span> University of the East | <a href="#" class="text-white hover:text-ue-red">Rush UE</a>
+        </p>
+    </div>
+</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getDatabase, ref, get, query, orderByChild, startAt, endAt, child } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey:"AIzaSyAO-rovSC2xK4ZUV9pD3ixKViQl9x4xzNk",
+      authDomain:"rushue-234bc.firebaseapp.com",
+      databaseURL:"https://rushue-234bc-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId:"rushue-234bc",
+      storageBucket:"rushue-234bc.appspot.com",
+      messagingSenderId:"574730836644",
+      appId:"1:574730836644:web:ff7c9e9eae7fc498e4a431"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getDatabase(app);
+
+    let mode = 'clicks';
+
+    const fromDateEl = document.getElementById('fromDate');
+    const toDateEl   = document.getElementById('toDate');
+    const buildingEl = document.getElementById('buildingFilter');
+    const btnRefresh = document.getElementById('btnRefresh');
+    const btnCSV     = document.getElementById('btnCSV');
+    const btnMode    = document.getElementById('btnMode');
+    const modeLabel  = document.getElementById('modeLabel');
+    const modeBadge  = document.getElementById('modeBadge');
+    const rangeLabel = document.getElementById('rangeLabel');
+    const authState  = document.getElementById('authState');
+
+    const chart1Title = document.getElementById('chart1Title');
+    const chart2Title = document.getElementById('chart2Title');
+    const sectionTitle= document.getElementById('sectionTitle');
+    const topTitle    = document.getElementById('topTitle');
+    const topHead     = document.getElementById('topHead');
+    const topBody     = document.getElementById('topBody');
+    const recentTitle = document.getElementById('recentTitle');
+    const recentHead  = document.getElementById('recentHead');
+   const sampleBody  = document.getElementById('sampleBody');
+    const countLabel  = document.getElementById('countLabel');
+
+    // --- ADDED THESE ---
+    const searchInputContainer = document.getElementById('searchInputContainer');
+    const searchInput = document.getElementById('searchInput');
+
+    // charts
+    let chartDaily=null, chartBuilding=null;
+
+    // date helpers
+    const isoDay = (d)=> d.toISOString().slice(0,10);
+    function parseYYYYMMDD(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+    function startOfDay(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
+    function endOfDay(d){ const x=new Date(d); x.setHours(23,59,59,999); return x; }
+
+    function setDefaultRange(){
+      const to=new Date();
+      const from=new Date(); from.setDate(to.getDate()-29);
+      fromDateEl.value = isoDay(from);
+      toDateEl.value   = isoDay(to);
+    }
+
+    // quick ranges
+    function applyQuickRange(kind){
+      const now=new Date();
+      let from = new Date(now);
+      if(kind==='7d'){ from.setDate(now.getDate()-6); }
+      else if(kind==='30d'){ from.setDate(now.getDate()-29); }
+      else if(kind==='ytd'){ from = new Date(now.getFullYear(),0,1); }
+      else if(kind==='12m'){ from = new Date(now); from.setFullYear(now.getFullYear()-1); from.setDate(from.getDate()+1); }
+      fromDateEl.value = isoDay(from);
+      toDateEl.value   = isoDay(now);
+      refresh();
+    }
+    document.querySelectorAll('.quick-range .btn').forEach(b=>{
+      b.addEventListener('click', ()=> applyQuickRange(b.dataset.range));
+    });
+
+    // ---- FETCHERS ----------------------------------------------------------
+
+    // Click events: single collection with ts_num for range filter
+    async function fetchClickEvents(){
+      const from = startOfDay(parseYYYYMMDD(fromDateEl.value));
+      const to   = endOfDay(parseYYYYMMDD(toDateEl.value));
+      const b    = (buildingEl.value||'').toUpperCase();
+
+      const qref = query(ref(db,'click_events'), orderByChild('ts_num'), startAt(from.getTime()), endAt(to.getTime()));
+      const snap = await get(qref);
+      let rows = snap.exists() ? Object.values(snap.val()) : [];
+      if (b) rows = rows.filter(r => (r.building||'').toUpperCase() === b);
+      return rows.sort((a,c)=> (a.ts_num||0)-(c.ts_num||0));
+    }
+
+    // Visitor slips: stored by /visitor_slips/YYYY/MM/DD
+   async function fetchVisitorSlips() {
+      const from = parseYYYYMMDD(fromDateEl.value);
+      const to = parseYYYYMMDD(toDateEl.value);
+      const b = (buildingEl.value || '').toUpperCase();
+
+      const all = [];
+      const cur = new Date(from);
+
+      while (cur <= to) {
+        const y = String(cur.getFullYear());
+        const m = String(cur.getMonth() + 1).padStart(2, '0');
+        const d = String(cur.getDate()).padStart(2, '0');
+        const dayRef = child(ref(db), `visitor_slips/${y}/${m}/${d}`);
+
+        const snap = await get(dayRef);
+        if (snap.exists()) {
+          Object.values(snap.val()).forEach(v => {
+            const building = (v.building || v.buildingCode || '').toUpperCase();
+            const row = {
+              date: v.date || `${y}-${m}-${d}`,
+              building,
+              purpose: v.purpose || '',
+              name: v.name || v.visitorName || '',
+            email: v.email || '',
+              room: v.roomKey || v.room || '',
+              ts_num: v.createdAt || new Date(`${y}-${m}-${d}T00:00:00`).getTime()
+            };
+            all.push(row);
+          });
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+
+      let rows = all;
+      if (b) rows = rows.filter(r => r.building === b);
+      return rows.sort((a, c) => (a.ts_num || 0) - (c.ts_num || 0));
+    }
+
+    // ---- AGGREGATION (works for both) -------------------------------------
+
+    function buildAggregatesForClicks(rows, fromStr, toStr){
+      // days range
+      const days=[]; {
+        const from=parseYYYYMMDD(fromStr), to=parseYYYYMMDD(toStr);
+        for(let d=new Date(from); d<=to; d.setDate(d.getDate()+1)) days.push(isoDay(d));
+      }
+      const perDay = Object.fromEntries(days.map(d=>[d,0]));
+      rows.forEach(r=>{ if(r.date && perDay[r.date]!==undefined) perDay[r.date]++; });
+
+      // per building
+      const perBldg = {EN:0,TYK:0,LCT:0,UEC_MAIN:0};
+      rows.forEach(r=>{ const b=(r.building||'').toUpperCase(); if(perBldg[b]!==undefined) perBldg[b]++; });
+
+      // top targets by building
+      const perBldgTargets = {EN:{},TYK:{},LCT:{},UEC_MAIN:{}}; // target
+      rows.forEach(r=>{
+        const b=(r.building||'').toUpperCase();
+        const t=r.target||'(unknown)';
+        if(!perBldgTargets[b]) perBldgTargets[b]={};
+       perBldgTargets[b][t]=(perBldgTargets[b][t]||0)+1;
+      });
+
+      return { perDay, perBldg, perBldgTargets, days };
+    }
+
+    function buildAggregatesForSlips(rows, fromStr, toStr){
+      const days=[]; {
+        const from=parseYYYYMMDD(fromStr), to=parseYYYYMMDD(toStr);
+        for(let d=new Date(from); d<=to; d.setDate(d.getDate()+1)) days.push(isoDay(d));
+      }
+      const perDay = Object.fromEntries(days.map(d=>[d,0]));
+      rows.forEach(r=>{ if(r.date && perDay[r.date]!==undefined) perDay[r.date]++; });
+
+      const perBldg = {EN:0,TYK:0,LCT:0,UEC_MAIN:0};
+      rows.forEach(r=>{ const b=(r.building||'').toUpperCase(); if(perBldg[b]!==undefined) perBldg[b]++; });
+
+      // top purposes by building
+      const perBldgPurposes = {EN:{},TYK:{},LCT:{},UEC_MAIN:{}}; 
+      rows.forEach(r=>{
+        const b=(r.building||'').toUpperCase();
+        const p=r.purpose || '(unspecified)';
+        if(!perBldgPurposes[b]) perBldgPurposes[b]={};
+        perBldgPurposes[b][p]=(perBldgPurposes[b][p]||0)+1;
+      });
+
+      return { perDay, perBldg, perBldgPurposes, days };
+    }
+
+    
+
+    // ---- RENDER ------------------------------------------------------------
+
+    function renderDaily(labels, data){
+      const ctx=document.getElementById('chartDaily').getContext('2d');
+      if(chartDaily) chartDaily.destroy();
+      chartDaily=new Chart(ctx,{
+        type:'line',
+        data:{ labels, datasets:[{ label:'Count', data, tension:.25 }]},
+       options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{precision:0}}}}
+      });
+    }
+    function renderBuilding(perBldg){
+      const ctx=document.getElementById('chartBuilding').getContext('2d');
+      if(chartBuilding) chartBuilding.destroy();
+      const labels=['Engineering (EN)','TYK','LCT','UEC Main'];
+      const data=[perBldg.EN,perBldg.TYK,perBldg.LCT,perBldg.UEC_MAIN];
+      chartBuilding=new Chart(ctx,{
+        type:'bar',
+        data:{ labels, datasets:[{ label:'Count', data }]},
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{precision:0}}}}
+      });
+    }
+
+    function renderTopListPerBuilding(obj, labelWord){
+      const body=topBody; body.innerHTML='';
+      const order=['EN','TYK','LCT','UEC_MAIN'];
+      const names={EN:'Engineering',TYK:'TYK',LCT:'LCT',UEC_MAIN:'UEC Main'};
+      order.forEach(code=>{
+        const pairs=Object.entries(obj[code]||{}).sort((a,b)=>b[1]-a[1]).slice(0,8);
+       const td = pairs.length ? pairs.map(([k,v])=>`${k} <span class="muted">(${v})</span>`).join(' · ')
+                                : '<span class="muted">No data</span>';
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td><strong>${names[code]}</strong></td><td>${td}</td>`;
+        body.appendChild(tr);
+      });
+      topHead.innerHTML = `<tr><th style="width:160px">Building</th><th>Top ${labelWord} </th></tr>`;
+    }
+
+    function renderClicksSample(rows){
+      countLabel.textContent = `${rows.length} events`;
+      recentHead.innerHTML = `<tr><th>Date</th><th>Building</th><th>Room</th><th>Target</th></tr>`;
+      const body=sampleBody; body.innerHTML='';
+      rows.slice(-50).reverse().forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${r.date||''}</td><td>${(r.building||'')}</td><td>${r.room||''}</td><td>${r.target||''}</td>`;
+body.appendChild(tr);
+      });
+    }
+
+    function renderSlipsSample(rows){
+      countLabel.textContent = `${rows.length} slips`;
+      recentHead.innerHTML = `<tr><th>Date</th><th>Building</th><th>Visitor</th><th>Purpose</th></tr>`;
+      const body=sampleBody; body.innerHTML='';
+      rows.slice(-50).reverse().forEach(r=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${r.date||''}</td><td>${(r.building||'')}</td><td>${r.name||''}</td><td>${r.purpose||''}</td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    function exportCSV(rows, headers, filenamePrefix){
+      const escape=v=> `"${String(v??'').replace(/"/g,'""')}"`;
+      const lines=[headers.join(',')];
+      rows.forEach(r=>{ lines.push(headers.map(h=>escape(r[h])).join(',')); });
+      const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');
+      a.href=url; a.download=`${filenamePrefix}_${fromDateEl.value}_to_${toDateEl.value}.csv`; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ---- MAIN REFRESH (UPDATED) ---------------------------------------------
+
+    async function refresh(){
+      rangeLabel.textContent = `${fromDateEl.value} → ${toDateEl.value}`;
+
+      if(mode==='clicks'){
+        sectionTitle.textContent='Click Events';
+        chart1Title.textContent='Clicks per day';
+       chart2Title.textContent='Clicks per building';
+        topTitle.textContent='Most clicked targets per building';
+        recentTitle.textContent='Recent events';
+        modeBadge.textContent='Showing: Click Events';
+        modeLabel.textContent='Switch to Visitor Slips';
+        
+        // Hide search bar
+        searchInputContainer.style.display = 'none'; 
+
+        const rows = await fetchClickEvents();
+        const { perDay, perBldg, perBldgTargets, days } = buildAggregatesForClicks(rows, fromDateEl.value, toDateEl.value);
+        renderDaily(days, days.map(d=>perDay[d]));
+        renderBuilding(perBldg);
+        renderTopListPerBuilding(perBldgTargets, 'Targets');
+        renderClicksSample(rows);
+        btnCSV.onclick = ()=>exportCSV(rows, ['date','building','room','target','ts_num'], 'rushue_clicks');
+
+    } else {
+        sectionTitle.textContent='Visitor Slips';
+        chart1Title.textContent='Slips per day';
+        chart2Title.textContent='Slips per building';
+        topTitle.textContent='Top purposes per building';
+        recentTitle.textContent='Recent visitor slips';
+        modeBadge.textContent='Showing: Visitor Slips';
+        modeLabel.textContent='Switch to Click Events';
+
+        // Show search bar
+        searchInputContainer.style.display = 'block'; 
+
+        let rows = await fetchVisitorSlips(); // <-- Changed to 'let'
+
+        // --- ADDED THIS FILTER LOGIC ---
+        const searchTerm = searchInput.value.trim().toLowerCase();
+        if (searchTerm) {
+          rows = rows.filter(r => 
+            (r.name || '').toLowerCase().includes(searchTerm)
+          );
+        }
+        // --- END OF NEW FILTER LOGIC ---
+
+        const { perDay, perBldg, perBldgPurposes, days } = buildAggregatesForSlips(rows, fromDateEl.value, toDateEl.value);
+        renderDaily(days, days.map(d=>perDay[d]));
+        renderBuilding(perBldg);
+        renderTopListPerBuilding(perBldgPurposes, 'Purposes');
+        renderSlipsSample(rows); // This will now render the filtered rows
+        btnCSV.onclick = ()=>exportCSV(rows, ['date','building','name','email','purpose','room','ts_num'], 'rushue_slips');
+      }
+    }
+
+    // mode toggle
+    btnMode.addEventListener('click', ()=>{
+      mode = (mode==='clicks') ? 'slips' : 'clicks';
+      refresh();
+    });
+
+    // auth first, then default range + initial refresh
+    onAuthStateChanged(auth, async (user)=>{
+      if(user){ authState.textContent = `Signed in (anon): ${user.uid.slice(0,6)}…`; return; }
+      try{ await signInAnonymously(auth); }
+      catch(e){ authState.textContent = 'Auth failed — enable Anonymous sign-in'; console.error(e); }
+    });
+
+    // set default dates and hook up refresh
+    setDefaultRange();
+    btnRefresh.addEventListener('click', refresh);
+    
+    // --- ADDED THIS ---
+    // Trigger refresh on 'Enter' key in search
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        refresh();
+      }
+    });
+
+    [fromDateEl,toDateEl,buildingEl].forEach(el=>el.addEventListener('change', refresh));
+
+    // first load
+    refresh();
+  </script>
+
+<script>
+    function showMessage(message) {
+      const toastEl = document.getElementById('custom-toast');
+      const toastBody = document.getElementById('toast-message');
+      toastBody.textContent = message;
+
+      const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+      toast.show();
+    }
+
+    window.showPage = function (pageId) {
+      const pages = document.querySelectorAll('.page-content');
+      pages.forEach(page => {
+        page.classList.remove('active');
+      });
+
+      const targetPage = document.getElementById(pageId + '-page');
+      if (targetPage) {
+        targetPage.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+
+    window.toggleTheme = function () {
+      const body = document.body;
+      const sunIcon = document.getElementById('sun-icon');
+      const moonIcon = document.getElementById('moon-icon');
+
+      if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline-block';
+        showMessage('Switched to Dark Mode');
+        localStorage.setItem('theme', 'dark-mode');
+      } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        sunIcon.style.display = 'inline-block';
+        moonIcon.style.display = 'none';
+        showMessage('Switched to Light Mode');
+        localStorage.setItem('theme', 'light-mode');
+      }
+    }
+
+    function applyInitialTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light-mode';
+      document.body.classList.add(savedTheme);
+      const sunIcon = document.getElementById('sun-icon');
+      const moonIcon = document.getElementById('moon-icon');
+
+      if (savedTheme === 'dark-mode') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline-block';
+      } else {
+        sunIcon.style.display = 'inline-block';
+        moonIcon.style.display = 'none';
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+      applyInitialTheme();
+
+      const today = new Date();
+      const formattedDate = today.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      });
+      document.getElementById("current-date").textContent = formattedDate;
+
+      if (!sessionStorage.getItem("announcementShown")) {
+        const modal = new bootstrap.Modal(document.getElementById("announcementModal"));
+        modal.show();
+        sessionStorage.setItem("announcementShown", "true");
+      }
+
+      showPage('dashboard');
+    });
+  </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
